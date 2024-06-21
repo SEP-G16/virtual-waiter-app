@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:virtual_waiter/welcome_screen.dart';
+import 'package:virtual_waiter/views/loading_screen.dart';
 
 void main() {
   runApp(const VirtualWaiter());
@@ -17,7 +17,7 @@ class VirtualWaiter extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
       ),
-      home: WelcomeScreen(),
+      home: LoadingScreen(),
     );
   }
 }
