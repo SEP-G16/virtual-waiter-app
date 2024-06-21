@@ -17,11 +17,16 @@ class WebSocketController extends GetxController{
 
   Future<void> _initController () async {
     try{
-      _socket = SIO.io(baseUrl, <String, dynamic>{
+      _socket = SIO.io('${baseUrl}', <String, dynamic>{
         'transports': ['websocket'],
         'autoConnect': false,
       });
+      _socket.onConnect((_){
+        print('Connected');
+      });
+
       _socket.connect();
+      print('Inited');
     }catch(e){
       print('Error establishing websocket connection.');
       rethrow;
@@ -36,5 +41,12 @@ class WebSocketController extends GetxController{
       print('Error sending help request');
       rethrow;
     }
+  }
+
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    _socket.connect();
+    super.onInit();
   }
 }
