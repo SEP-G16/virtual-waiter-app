@@ -1,5 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:virtual_waiter/components/menu_item_tile.dart';
+import 'package:virtual_waiter/constants/menu_data_constants.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
+import 'package:virtual_waiter/controller/views/menu_screen/menu_widget_tree_builder.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -7,13 +11,55 @@ class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      //TODO:Create Drawer to have settings option
+      // drawer: Drawer(
+      //   child: Text('Drawer'),
+      // ),
+      // drawerEdgeDragWidth: MediaQuery.of(context).size.width,
       body: SafeArea(
-        child: Container(
-          alignment: Alignment.center,
-          child: Text(
-            'Menu',
-            style: TextConstants.mainTextStyle(),
-          ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Icon(Icons.menu),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Menu',
+                        style: TextConstants.mainTextStyle(fontSize: 32),
+                      ),
+                      Text(
+                        'Choose your favourite meals',
+                        style: TextConstants.subTextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Icon(Icons.room_service_outlined),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: ScrollPhysics(),
+                child: Column(
+                  children: MenuWidgetTreeBuilder.instance.widgetList,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
