@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:virtual_waiter/controller/network/web-socket-controller.dart';
+import 'package:virtual_waiter/controller/network/web_socket_controller.dart';
 import 'package:virtual_waiter/controller/views/welcome_screen_controller.dart';
 
 class ControllerInitializer{

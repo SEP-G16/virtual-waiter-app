@@ -38,6 +38,8 @@ dependencies:
   get: ^4.6.6
   socket_io_client: ^2.0.3+1
 
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -88,5 +90,9 @@ flutter:
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
   #
+  fonts:
+    - family: Altone Trial
+      fonts:
+        - asset: fonts/Altone-Trial-Regular.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
