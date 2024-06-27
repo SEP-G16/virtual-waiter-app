@@ -28,7 +28,10 @@ class MenuWidgetTreeBuilder extends GetxController {
       String category = entry.key;
       List<MenuItem> items = entry.value;
       _widgetList.add(Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20.0),
+        margin: const EdgeInsets.symmetric(
+          horizontal: 20.0,
+          vertical: 5.0,
+        ),
         child: Row(
           children: [
             const Expanded(
