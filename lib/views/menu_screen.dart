@@ -21,6 +21,17 @@ class MenuScreen extends StatelessWidget {
         child: Column(
           children: [
             Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
               padding: EdgeInsets.symmetric(horizontal: 10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

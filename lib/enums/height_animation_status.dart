@@ -1,0 +1,4 @@
+enum HeightAnimateStatus {
+  extended,
+  collapsed,
+}

@@ -83,7 +83,7 @@ class MenuItemTile extends StatelessWidget {
                           fontSize: 28),
                     ),
                     Text(
-                      item.description,
+                      item.shortDescription,
                       style: TextConstants.subTextStyle(
                           fontSize: 18),
                       overflow: TextOverflow.ellipsis,

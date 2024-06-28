@@ -3,13 +3,17 @@ import 'package:get/get.dart';
 import 'package:virtual_waiter/components/menu_item_tile.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/data/menu_data_controller.dart';
+import 'package:virtual_waiter/controller/views/view_menu_item_screen/vmis_state_controller.dart';
 import 'package:virtual_waiter/model/menu_item.dart';
+import 'package:virtual_waiter/views/view_menu_item_screen.dart';
 
 class MenuWidgetTreeBuilder extends GetxController {
   List<Widget> _widgetList = [];
   List<Widget> get widgetList => _widgetList;
 
   final MenuDataController _menuDataController = MenuDataController.instance;
+
+  final VmisStateController _vmisStateController = VmisStateController.instance;
 
   static MenuWidgetTreeBuilder instance = Get.find();
 
@@ -64,7 +68,13 @@ class MenuWidgetTreeBuilder extends GetxController {
         _widgetList.add(
           MenuItemTile(
             item: item,
-            onPressed: () {},
+            onPressed: () {
+              Get.to(
+                () => ViewMenuItemScreen(
+                  menuItem: item,
+                ),
+              );
+            },
           ),
         );
       }

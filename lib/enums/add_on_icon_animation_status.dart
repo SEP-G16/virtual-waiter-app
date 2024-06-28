@@ -1,0 +1,4 @@
+enum AddOnIconAnimationStatus{
+  addIconDisplayed,
+  removeIconDisplayed,
+}
