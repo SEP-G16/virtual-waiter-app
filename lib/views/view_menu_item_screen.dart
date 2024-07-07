@@ -151,12 +151,29 @@ class ViewMenuItemScreen extends StatelessWidget {
                                         ),
                                         RichText(
                                           text: TextSpan(
-                                            text:
-                                                '\$${menuItem.price.toStringAsFixed(2)}',
-                                            style: TextConstants.subTextStyle(
-                                                fontSize: 34,
-                                                textColor: Colors.black),
-                                            children: <TextSpan>[
+                                            children: [
+                                              WidgetSpan(
+                                                child: Transform.translate(
+                                                  offset: Offset(0, -6),
+                                                  child: Text(
+                                                    '\$',
+                                                    style: TextConstants
+                                                        .subTextStyle(
+                                                      fontSize: 24,
+                                                      textColor: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: menuItem.price
+                                                    .toStringAsFixed(2),
+                                                style:
+                                                    TextConstants.subTextStyle(
+                                                  fontSize: 34,
+                                                  textColor: Colors.black,
+                                                ),
+                                              ),
                                               TextSpan(
                                                 text: '/per portion',
                                                 style:
@@ -762,10 +779,24 @@ class ViewMenuItemScreen extends StatelessWidget {
                                     ],
                                   ),
                                   Obx(
-                                    () => Text(
-                                      '\$${_vmisStateController.totalAmount.toStringAsFixed(2)}',
-                                      style: TextConstants.subTextStyle(
-                                          fontSize: 32),
+                                    () => RichText(
+                                      text: TextSpan(children: [
+                                        WidgetSpan(
+                                          child: Transform.translate(
+                                            offset: Offset(0, -2),
+                                            child: Text(
+                                              '\$',
+                                              style: TextConstants.subTextStyle(
+                                                  fontSize: 24),
+                                            ),
+                                          ),
+                                        ),
+                                        TextSpan(
+                                          text: _vmisStateController.totalAmount.toStringAsFixed(2),
+                                          style: TextConstants.subTextStyle(
+                                              fontSize: 32, textColor: Colors.black),
+                                        ),
+                                      ]),
                                     ),
                                   ),
                                 ],
