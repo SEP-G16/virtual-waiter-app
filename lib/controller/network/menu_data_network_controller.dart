@@ -19,25 +19,34 @@ class MenuDataNetworkController extends GetxController {
     return controller;
   }
 
-  List _excludeJsonGeneratorByCategory(String category) {
-    return _menuItems.any((item) => item.category == category)
-        ? _menuItems
-            .where((item) => item.category == category)
-            .toList()
-            .map((item) => item.toJson())
-            .toList()
-        : [];
+  List _excludeJsonGeneratorByCategory(List<String> categories) {
+    List<Map> filteredItems = [];
+    for(String category in categories)
+      {
+        bool itemsExist = _menuItems.any((item) => item.category == category);
+        if(itemsExist)
+          {
+            for (MenuItem item in _menuItems) {
+              if(item.category == category)
+                {
+                  filteredItems.add(item.toJson());
+                }
+            }
+          }
+      }
+    return filteredItems;
   }
 
   Future<void> _getMenuData() async {
     if (_menuData.keys.isEmpty) {
       await Future.delayed(Duration(milliseconds: 100));
       _menuData = {
-        'Appetizers': _excludeJsonGeneratorByCategory('Appetizers'),
-        'Entrees': _excludeJsonGeneratorByCategory('Entrees'),
-        'Main Course': _excludeJsonGeneratorByCategory('Main Course'),
-        'Desserts':_excludeJsonGeneratorByCategory('Desserts'),
-        'Beverages':_excludeJsonGeneratorByCategory('Beverages'),
+        'Appetizers': _excludeJsonGeneratorByCategory(['Appetizers']),
+        'Breakfast' : _excludeJsonGeneratorByCategory(['Breakfast']),
+        'Salads & Soups': _excludeJsonGeneratorByCategory(['Salads', 'Soups']),
+        'Main Course': _excludeJsonGeneratorByCategory(['Main Course']),
+        'Desserts':_excludeJsonGeneratorByCategory(['Desserts']),
+        'Beverages':_excludeJsonGeneratorByCategory(['Beverages']),
       };
     }
   }
