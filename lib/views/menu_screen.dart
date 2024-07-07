@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:virtual_waiter/components/menu_item_tile.dart';
-import 'package:virtual_waiter/constants/menu_data_constants.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/views/menu_screen/menu_widget_tree_builder.dart';
+
+import 'order_screen.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -57,7 +56,11 @@ class MenuScreen extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Icon(Icons.room_service_outlined),
+                    child: GestureDetector(
+                        onTap: (){
+                          OrderScreen();
+                        },
+                        child: Icon(Icons.room_service_outlined)),
                   ),
                 ],
               ),
