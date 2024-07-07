@@ -42,4 +42,14 @@ class MenuDataController extends GetxController {
       }
     }
   }
+
+  MenuItem findItemById({required String id}) {
+    if(_allItems.any((item) => item.id == id)){
+      return _allItems.where((item) => item.id == id).toList().first;
+    }
+    else
+      {
+        throw Exception('Item Not Found');
+      }
+  }
 }

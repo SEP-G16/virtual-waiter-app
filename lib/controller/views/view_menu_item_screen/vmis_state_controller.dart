@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
+import 'package:virtual_waiter/controller/data/menu_data_controller.dart';
 import 'package:virtual_waiter/controller/data/order_data_controller.dart';
 import 'package:virtual_waiter/model/menu_item.dart';
 import 'package:virtual_waiter/model/order_item.dart';
@@ -7,10 +9,14 @@ import 'package:virtual_waiter/model/order_item.dart';
 class VmisStateController extends GetxController {
   static VmisStateController instance = Get.find();
 
+  final MenuDataController _menuDataController = MenuDataController.instance;
   final OrderDataController _orderDataController = OrderDataController.instance;
 
   Map<String, int> _selectedAddOnsDataMap = {};
   Map<String, RxInt> _selectedAddOnsQuantityMap = {};
+
+  RxBool _editingMode = false.obs;
+  bool get editingMode => _editingMode.value;
 
   MenuItem? _menuItem;
   MenuItem get menuItem => _menuItem!;
@@ -76,6 +82,7 @@ class VmisStateController extends GetxController {
     _selectedAddOnsQuantityMap = {};
     _selectedAddOnsDataMap = {};
     _totalAmount.value = 0;
+    _editingMode.value = false;
   }
 
   void addAddOnToDataMap({required String addOnId}) {
@@ -131,13 +138,18 @@ class VmisStateController extends GetxController {
     _totalAmount.value = totalAddOnPrice + totalBasePrice;
   }
 
-  void addOrder() {
-    itemNotNullCheck();
+  void _fillSelectedAddOnsDataMap() {
+    _selectedAddOnsDataMap = {};
     for (var entry in _selectedAddOnsQuantityMap.entries) {
       String addOnId = entry.key;
       int addOnQuantity = entry.value.value;
       _selectedAddOnsDataMap[addOnId] = addOnQuantity;
     }
+  }
+
+  void addOrder() {
+    itemNotNullCheck();
+    _fillSelectedAddOnsDataMap();
     _orderDataController.addOrderItem(
       orderItem: OrderItem(
         menuItemId: menuItem.id,
@@ -147,5 +159,39 @@ class VmisStateController extends GetxController {
         totalAmount: totalAmount,
       ),
     );
+  }
+
+  void initByOrderItem({required OrderItem orderItem}) {
+    _menuItem = _menuDataController.findItemById(id: orderItem.menuItemId);
+    itemNotNullCheck();
+    _editingMode.value = true;
+    _quantity.value = orderItem.itemQuantity;
+    _additionalNotes = orderItem.additionalNote;
+    orderItem.addOnsQuantity.keys.forEach((addOnId) {
+      _selectedAddOnsQuantityMap[addOnId] = 1.obs;
+      _selectedAddOnsQuantityMap[addOnId]!.value =
+          orderItem.addOnsQuantity[addOnId]!;
+    });
+    _totalAmount.value = orderItem.totalAmount;
+  }
+
+  bool checkAddOnAlreadyAdded({required String addOnId}) {
+    return _selectedAddOnsQuantityMap.keys.any((id) => id == addOnId);
+  }
+
+  void updateOrder() {
+    itemNotNullCheck();
+    if (_orderDataController.orderAlreadyExists(menuItemId: _menuItem!.id)) {
+      _orderDataController.removeOrderItem(menuItemId: _menuItem!.id);
+      _fillSelectedAddOnsDataMap();
+      _orderDataController.addOrderItem(orderItem:
+        OrderItem(
+          menuItemId: menuItem!.id,
+          itemQuantity: _quantity.value,
+          addOnsQuantity: _selectedAddOnsDataMap,
+          totalAmount: _totalAmount.value,
+        ),
+      );
+    }
   }
 }

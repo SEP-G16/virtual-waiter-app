@@ -8,12 +8,15 @@ import '../../data/menu_data_controller.dart';
 
 class OssController extends GetxController {
   final MenuDataController _mdc = MenuDataController.instance;
-  final OrderDataController _odc = OrderDataController.instance;
+  late final OrderDataController _odc;
 
   RxList<OrderMenuItem> _orderMenuItems = <OrderMenuItem>[].obs;
   List<OrderMenuItem> get orderMenuItems => _orderMenuItems.value;
 
   static OssController instance = Get.find();
+
+  RxDouble _totalAmount = 0.0.obs;
+  double get totalAmount => _totalAmount.value;
 
   OrderMenuItem _generateOrderMenuItem({required OrderItem orderItem}) {
     MenuItem menuItem = _mdc.allItems
@@ -30,10 +33,12 @@ class OssController extends GetxController {
           .first['name']);
     });
 
+    _totalAmount.value += orderItem.totalAmount;
+
     return OrderMenuItem(
       itemCategory: menuItem.category,
       menuItemId: menuItem.id,
-      menuItemName : menuItem.name,
+      menuItemName: menuItem.name,
       menuItemImageUrl: menuItem.imageUrl,
       itemQuantity: orderItem.itemQuantity,
       addOnList: addOnList,
@@ -43,17 +48,41 @@ class OssController extends GetxController {
 
   void analyseOrderData() {
     _orderMenuItems.value = [];
+    _totalAmount.value = 0.0;
     _odc.orderList.forEach((order) {
       _orderMenuItems.add(_generateOrderMenuItem(orderItem: order));
-      update();
     });
+    update();
   }
 
-  void removeOrderItem({required String menuItemId}){
-    if(_orderMenuItems.value.any((order) => order.menuItemId == menuItemId))
-      {
-        _orderMenuItems.value.removeWhere((order) => order.menuItemId == menuItemId);
-        update();
-      }
+  void removeOrderItem({required String menuItemId}) {
+    if (_orderMenuItems.value.any((order) => order.menuItemId == menuItemId)) {
+      _orderMenuItems.value
+          .removeWhere((order) => order.menuItemId == menuItemId);
+      _odc.removeOrderItem(menuItemId: menuItemId);
+      update();
+    }
+  }
+
+  OrderItem findOrderItemByMenuItemId({required String id}) {
+    return _odc.findByMenuItemId(id : id);
+  }
+
+  void _onItemsChanged(List<OrderItem> items) {
+    analyseOrderData();
+  }
+
+  @override
+  void onReady() {
+    // TODO: implement onReady
+    super.onReady();
+    ever(_odc.listenableOrderList, _onItemsChanged);
+  }
+
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    _odc = OrderDataController.instance;
   }
 }

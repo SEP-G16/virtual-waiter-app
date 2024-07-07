@@ -11,6 +11,7 @@ import 'package:virtual_waiter/controller/views/view_menu_item_screen/vmis_state
 import 'package:virtual_waiter/enums/add_on_icon_animation_status.dart';
 import 'package:virtual_waiter/enums/height_animation_status.dart';
 import 'package:virtual_waiter/model/menu_item.dart';
+import 'package:virtual_waiter/views/order_screen.dart';
 
 class ViewMenuItemScreen extends StatelessWidget {
   ViewMenuItemScreen({required this.menuItem}) {
@@ -21,7 +22,6 @@ class ViewMenuItemScreen extends StatelessWidget {
   late final VmisStateController _vmisStateController;
   @override
   Widget build(BuildContext context) {
-    _vmisStateController.menuItem = menuItem;
     List<String> tagList = [menuItem.cuisine] + menuItem.tags;
 
     return Scaffold(
@@ -57,7 +57,9 @@ class ViewMenuItemScreen extends StatelessWidget {
                       Align(
                         alignment: Alignment.center,
                         child: Text(
-                          'Add ${menuItem.name} to your order',
+                          _vmisStateController.editingMode
+                              ? 'Make changes to your ${menuItem.name} order'
+                              : 'Add ${menuItem.name} to your order',
                           style: TextConstants.mainTextStyle(fontSize: 32),
                         ),
                       ),
@@ -426,6 +428,22 @@ class ViewMenuItemScreen extends StatelessWidget {
                                               AddOnIconAnimationController(),
                                               tag: iconAnimatorTag);
 
+                                          //checking if already inited(editing order)
+                                          if (_vmisStateController
+                                              .checkAddOnAlreadyAdded(
+                                                  addOnId: addOn['id'])) {
+                                            final heightAnimCont = Get.find<
+                                                    AddOnsHeightAnimationController>(
+                                                tag: heightAnimatorTag);
+                                            heightAnimCont
+                                                .heightForwardAnimation();
+
+                                            final iconAnimCont = Get.find<
+                                                    AddOnIconAnimationController>(
+                                                tag: iconAnimatorTag);
+                                            iconAnimCont.isAddIcon = false;
+                                          }
+
                                           return GetBuilder<
                                               AddOnsHeightAnimationController>(
                                             tag: heightAnimatorTag,
@@ -792,9 +810,11 @@ class ViewMenuItemScreen extends StatelessWidget {
                                           ),
                                         ),
                                         TextSpan(
-                                          text: _vmisStateController.totalAmount.toStringAsFixed(2),
+                                          text: _vmisStateController.totalAmount
+                                              .toStringAsFixed(2),
                                           style: TextConstants.subTextStyle(
-                                              fontSize: 32, textColor: Colors.black),
+                                              fontSize: 32,
+                                              textColor: Colors.black),
                                         ),
                                       ]),
                                     ),
@@ -820,9 +840,16 @@ class ViewMenuItemScreen extends StatelessWidget {
                                   ActionButton(
                                     fontSize: 24,
                                     width: 200,
-                                    title: 'Add to Orders',
+                                    title: _vmisStateController.editingMode ? 'Save Changes' :'Add to Orders',
                                     onPressed: () {
-                                      _vmisStateController.addOrder();
+                                      if(_vmisStateController.editingMode)
+                                        {
+                                          _vmisStateController.updateOrder();
+                                        }
+                                      else
+                                        {
+                                          _vmisStateController.addOrder();
+                                        }
                                       Get.back();
                                       _vmisStateController.resetData();
                                     },

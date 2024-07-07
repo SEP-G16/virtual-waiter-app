@@ -17,4 +17,21 @@ class OrderItem {
   String toString() {
     return 'OrderItem{menuItemId: $menuItemId, itemQuantity: $itemQuantity, addOnsQuantity: $addOnsQuantity, additionalNote: $additionalNote, totalAmount: $totalAmount}';
   }
+
+  OrderItem copyWith({
+    String? menuItemId,
+    int? itemQuantity,
+    Map<String, int>? addOnsQuantity,
+    String? additionalNote,
+    double? totalAmount,
+  }) {
+    return OrderItem(
+      menuItemId: menuItemId ?? this.menuItemId,
+      itemQuantity: itemQuantity ?? this.itemQuantity,
+      addOnsQuantity: addOnsQuantity ?? this.addOnsQuantity,
+      additionalNote: additionalNote ?? this.additionalNote,
+      totalAmount: totalAmount ?? this.totalAmount,
+    );
+  }
+
 }

@@ -155,30 +155,33 @@ class OrderTile extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(width: 20.0,),
-          RichText(
-            text: TextSpan(
-              children: [
-                WidgetSpan(
-                  child: Transform.translate(
-                    offset: Offset(0.0, -5.0),
-                    child: Text(
-                      '\$',
-                      style: TextConstants.subTextStyle(
-                        fontSize: 20,
-                        textColor: Colors.black,
+          Container(
+            alignment: Alignment.centerRight,
+            width: 120.0,
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  WidgetSpan(
+                    child: Transform.translate(
+                      offset: Offset(0.0, -5.0),
+                      child: Text(
+                        '\$',
+                        style: TextConstants.subTextStyle(
+                          fontSize: 20,
+                          textColor: Colors.black,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                TextSpan(
-                  text: '${totalAmount.toStringAsFixed(2)}',
-                  style: TextConstants.subTextStyle(
-                    fontSize: 30,
-                    textColor: Colors.black,
+                  TextSpan(
+                    text: '${totalAmount.toStringAsFixed(2)}',
+                    style: TextConstants.subTextStyle(
+                      fontSize: 30,
+                      textColor: Colors.black,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
