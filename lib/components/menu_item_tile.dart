@@ -59,7 +59,7 @@ class MenuItemTile extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20.0),
                 child: CachedNetworkImage(
-                  fit: BoxFit.fitWidth,
+                  fit: BoxFit.cover,
                   width: 200.0,
                   height: 200.0,
                   imageUrl: item.imageUrl,
