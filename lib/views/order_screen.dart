@@ -9,6 +9,7 @@ import 'package:virtual_waiter/controller/network/web_socket_controller.dart';
 import 'package:virtual_waiter/controller/views/order_screen/order_screen_state_controller.dart';
 import 'package:virtual_waiter/controller/views/view_menu_item_screen/vmis_state_controller.dart';
 import 'package:virtual_waiter/views/view_menu_item_screen.dart';
+import 'package:virtual_waiter/views/waiting_screen.dart';
 
 import '../model/order_item.dart';
 
@@ -200,7 +201,15 @@ class OrderScreen {
                       SizedBox(height: 10.0,),
                       ActionButton(
                         title: 'Complete Order',
-                        onPressed: () {},
+                        onPressed: () async {
+                          try{
+                            await _ossController.completeOrder();
+                            Get.back();
+                            Get.to(() => WaitingScreen());
+                          }catch(e){
+                            //Add error dialog here
+                          }
+                        },
                         width: 250,
                       ),
                     ],
