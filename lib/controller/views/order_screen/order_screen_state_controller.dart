@@ -46,6 +46,7 @@ class OssController extends GetxController {
     );
   }
 
+  //TODO: Sort orders by category order
   void analyseOrderData() {
     _orderMenuItems.value = [];
     _totalAmount.value = 0.0;
@@ -68,6 +69,13 @@ class OssController extends GetxController {
     return _odc.findByMenuItemId(id : id);
   }
 
+  Future<void> completeOrder () async{
+   try{
+     await _odc.completeOrder();
+   }catch(e){
+     throw Exception('Cannot complete order');
+   }
+  }
   void _onItemsChanged(List<OrderItem> items) {
     analyseOrderData();
   }

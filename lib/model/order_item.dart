@@ -34,4 +34,14 @@ class OrderItem {
     );
   }
 
+  Map<String, dynamic> toMap() {
+    return {
+      'menuItemId': menuItemId,
+      'itemQuantity': itemQuantity,
+      'addOnsQuantity': addOnsQuantity,
+      'additionalNote': additionalNote,
+      'totalAmount': totalAmount,
+    };
+  }
+
 }
