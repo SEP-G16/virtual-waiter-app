@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as SIO;
-import 'package:virtual_waiter/constants.dart';
+import 'package:virtual_waiter/constants/network_constants.dart';
 
 class WebSocketController extends GetxController{
   static WebSocketController instance = Get.find();
@@ -21,6 +21,7 @@ class WebSocketController extends GetxController{
         'transports': ['websocket'],
         'autoConnect': false,
       });
+
       _socket.onConnect((_){
         print('Connected');
       });
@@ -50,3 +51,4 @@ class WebSocketController extends GetxController{
     super.onInit();
   }
 }
+
