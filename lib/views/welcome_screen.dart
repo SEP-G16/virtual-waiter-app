@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:virtual_waiter/components/message_dialog_box.dart';
+import 'package:virtual_waiter/components/request_help_button.dart';
+import 'package:virtual_waiter/constants/svg_constants.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/views/welcome_screen_controller.dart';
 import 'package:virtual_waiter/views/menu_screen.dart';
@@ -12,26 +15,7 @@ class WelcomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: TextButton(
-        onPressed: () async {
-          try {
-            await WelcomeScreenController.instance.onTapForRequestHelpBtn();
-          } catch (e) {
-            MessageDialogBox(
-              message: 'An unexpected error occurred!',
-              borderColor: Colors.redAccent,
-            );
-          }
-        },
-        child: Text(
-          'Request\nHelp',
-          style: TextConstants.subTextStyle(
-            fontSize: 20,
-            textColor: Colors.black,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      ),
+      floatingActionButton: RequestHelpButton(),
       body: SafeArea(
         child: Container(
             alignment: Alignment.center,

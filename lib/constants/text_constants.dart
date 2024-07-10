@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TextConstants {
+
+  TextConstants._();
+
   static TextStyle mainTextStyle(
       {double? fontSize, String? fontFamily, FontWeight? fontWeight, Color? textColor}) {
     return TextStyle(

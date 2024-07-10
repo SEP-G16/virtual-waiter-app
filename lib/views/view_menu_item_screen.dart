@@ -736,7 +736,11 @@ class ViewMenuItemScreen extends StatelessWidget {
                                           width: 2),
                                       borderRadius: BorderRadius.circular(10.0),
                                     );
-                                    return TextField(
+                                    return TextFormField(
+                                      onChanged: (value){
+                                        _vmisStateController.additionalNotes = value;
+                                      },
+                                      initialValue: _vmisStateController.additionalNotes,
                                       maxLines: null,
                                       style: TextConstants.subTextStyle(
                                           fontSize: 17),

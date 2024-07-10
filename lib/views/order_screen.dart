@@ -5,6 +5,7 @@ import 'package:virtual_waiter/components/action_button.dart';
 import 'package:virtual_waiter/components/order_tile.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/data/menu_data_controller.dart';
+import 'package:virtual_waiter/controller/data/table_data_controller.dart';
 import 'package:virtual_waiter/controller/network/web_socket_controller.dart';
 import 'package:virtual_waiter/controller/views/order_screen/order_screen_state_controller.dart';
 import 'package:virtual_waiter/controller/views/view_menu_item_screen/vmis_state_controller.dart';
@@ -205,7 +206,8 @@ class OrderScreen {
                           try{
                             await _ossController.completeOrder();
                             Get.back();
-                            Get.to(() => WaitingScreen());
+                            TableDataController.instance.waitingMode = true;
+                            Get.offAll(() => WaitingScreen());
                           }catch(e){
                             //Add error dialog here
                           }

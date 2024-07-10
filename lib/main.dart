@@ -13,6 +13,7 @@ class VirtualWaiter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Virtual Waiter',
       theme: ThemeData(
         useMaterial3: true,
