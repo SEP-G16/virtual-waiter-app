@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:virtual_waiter/components/action_button.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/views/menu_screen/menu_widget_tree_builder.dart';
 
+import 'configure_screen.dart';
 import 'order_screen.dart';
 
 class MenuScreen extends StatelessWidget {
@@ -10,6 +13,53 @@ class MenuScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: SafeArea(
+        child: Container(
+          width: 400,
+          color: Colors.white,
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // ActionButton(
+              //   title: 'Settings',
+              //   onPressed: () {},
+              // ),
+              Text('Welcome to Virtual Waiter', style: TextConstants.mainTextStyle(fontSize: 30), textAlign: TextAlign.center,),
+              GestureDetector(
+                onTap: () => Get.to(() => ConfigureScreen()),
+                child: Container(
+                  width: 230,
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.amber,
+                      width: 2,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.settings,
+                        size: 30,
+                      ),
+                      SizedBox(
+                        width: 15,
+                      ),
+                      Text(
+                        'Settings',
+                        style: TextConstants.subTextStyle(fontSize: 24),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       backgroundColor: Colors.white,
       //TODO:Create Drawer to have settings option
       // drawer: Drawer(
@@ -38,7 +88,13 @@ class MenuScreen extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Icon(Icons.menu),
+                    child: Builder(builder: (context) {
+                      return IconButton(
+                          onPressed: () {
+                            Scaffold.of(context).openDrawer();
+                          },
+                          icon: Icon(Icons.menu));
+                    }),
                   ),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -57,7 +113,7 @@ class MenuScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           OrderScreen();
                         },
                         child: Icon(Icons.room_service_outlined)),

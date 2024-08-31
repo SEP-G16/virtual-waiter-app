@@ -40,7 +40,7 @@ class OrderDataController extends GetxController{
     }
   }
 
-  Future<void >completeOrder() async {
+  Future<void>completeOrder() async {
     try{
       List<Map<String,dynamic>> orderDataMapList = _orderList.map<Map<String, dynamic>>((order) => order.toMap()).toList();
       await _orderDataNetworkController.sendOrder(mapList : orderDataMapList);

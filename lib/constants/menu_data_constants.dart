@@ -243,4 +243,19 @@ class MenuDataConstants {
       ],
     ),
   ];
+
+  static List<String> getUniqueTags() {
+    final uniqueTags = menuItems
+        .expand((menuItem) => menuItem.tags)
+        .toSet()
+        .toList();
+    uniqueTags.sort();
+    return uniqueTags;
+  }
+
+  static List<Map<String, String>> getFormattedTags() {
+    return getUniqueTags()
+        .map((tag) => {"tag": "$tag"})
+        .toList();
+  }
 }

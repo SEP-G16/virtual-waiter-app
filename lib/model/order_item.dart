@@ -1,9 +1,12 @@
+import '../enums/order_item_status.dart';
+
 class OrderItem {
   final String menuItemId;
   final int itemQuantity;
   final Map<String, int> addOnsQuantity;
   String? additionalNote;
   final double totalAmount;
+  final OrderItemStatus status;
 
   OrderItem({
     required this.menuItemId,
@@ -11,6 +14,7 @@ class OrderItem {
     required this.addOnsQuantity,
     this.additionalNote,
     required this.totalAmount,
+    this.status = OrderItemStatus.Pending
   });
 
   @override
