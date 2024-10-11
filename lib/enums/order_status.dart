@@ -1,3 +1,3 @@
 enum OrderStatus{
-  Pending, Processing, Complete
+  Editing, Pending, Processing, Complete
 }
