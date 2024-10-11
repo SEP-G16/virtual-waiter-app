@@ -1,15 +1,18 @@
+import 'package:virtual_waiter/model/category.dart';
+import 'package:virtual_waiter/model/add_on.dart';
+
 class MenuItem {
-  String id;
+  int id;
   String name;
   String shortDescription;
   String longDescription;
-  String category;
+  Category category;
   List<String> ingredients;
   double price;
   String cuisine;
   List<String> tags;
   String imageUrl;
-  List<Map<String, dynamic>> addOns;
+  List<AddOn> addOns;
 
   MenuItem({
     required this.id,
@@ -25,35 +28,35 @@ class MenuItem {
     this.addOns = const [],
   });
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
       'shortDescription': shortDescription,
       'longDescription': longDescription,
-      'category': category,
+      'category': category.toMap(),
       'ingredients': ingredients,
       'price': price,
       'cuisine': cuisine,
       'tags': tags,
       'imageUrl': imageUrl,
-      'addOns': addOns,
+      'addOns': addOns.map((addOn) => addOn.toMap()).toList(),
     };
   }
 
-  factory MenuItem.fromJson(Map<String, dynamic> map) {
+  factory MenuItem.fromMap(Map<String, dynamic> map) {
     return MenuItem(
       id: map['id'],
       name: map['name'],
       shortDescription: map['shortDescription'],
       longDescription: map['longDescription'],
-      category: map['category'],
+      category: Category.fromMap(map['category']),
       ingredients: List<String>.from(map['ingredients']),
       price: map['price'],
       cuisine: map['cuisine'],
       tags: List<String>.from(map['tags']),
       imageUrl: map['imageUrl'] ?? 'https://saltedmint.com/wp-content/uploads/2024/01/Vegetable-Spring-Rolls-3.jpg',
-      addOns: List<Map<String, dynamic>>.from(map['addOns'] ?? []),
+      addOns: map['addOns'] != null ? List<AddOn>.from(map['addOns'].map((addOn) => AddOn.fromMap(addOn))) : [],
     );
   }
 }
