@@ -1,51 +1,88 @@
 import 'package:get/get.dart';
-import 'package:virtual_waiter/controller/data/menu_data_controller.dart';
+import 'package:virtual_waiter/enums/order_item_status.dart';
+import 'package:virtual_waiter/enums/order_status.dart';
+import 'package:virtual_waiter/model/order.dart';
 
 import '../../model/order_item.dart';
-import '../network/order_data_network_controller.dart';
 
 class OrderDataController extends GetxController{
+
   static OrderDataController instance = Get.find();
 
-  final OrderDataNetworkController _orderDataNetworkController = OrderDataNetworkController.instance;
+  List<Order> _orderList = [];
+  List<Order> get orderList => _orderList;
+  RxList<Order> listenableOrderList = <Order>[].obs;
 
-  List<OrderItem> _orderList = [];
-  List<OrderItem> get orderList => _orderList;
-  RxList<OrderItem> listenableOrderList = <OrderItem>[].obs;
-
-  void addOrderItem({required OrderItem orderItem}){
-    _orderList.add(orderItem);
-    listenableOrderList.add(orderItem);
-    update();
+  void addOrder({required Order order}){
+    _orderList.add(order);
+    listenableOrderList.assignAll(_orderList);
   }
 
-  void removeOrderItem({required String menuItemId}){
-    _orderList.removeWhere((order) => order.menuItemId == menuItemId);
-    listenableOrderList.removeWhere((order) => order.menuItemId == menuItemId);
-    update();
+  void updateEditableOrder({required Order order}){
+    int index = _orderList.indexWhere((element) => element.status == OrderStatus.Editing);
+    _orderList[index] = order;
+    listenableOrderList.assignAll(_orderList);
   }
 
-  bool orderAlreadyExists({required String menuItemId}){
-    return _orderList.any((order) => order.menuItemId == menuItemId);
+  void addOrderItemToEditableOrder({required OrderItem orderItem}){
+    if(_orderList.any((order) => order.status == OrderStatus.Editing))
+      {
+        int index = _orderList.indexWhere((element) => element.status == OrderStatus.Editing);
+        _orderList[index].orderItems.add(orderItem);
+        listenableOrderList.assignAll(_orderList);
+      }
+    else
+      {
+        _orderList.add(Order(id: -1, orderItems: [orderItem], status: OrderStatus.Editing));
+        listenableOrderList.assignAll(_orderList);
+      }
   }
 
-  OrderItem findByMenuItemId({required String id}) {
-    if (orderAlreadyExists(menuItemId: id)) {
-      return _orderList
-          .where((order) => order.menuItemId == id)
-          .toList()
-          .first;
-    } else {
-      throw Exception('Order Not Found');
+  void removeOrderItemFromEditableOrder({required int menuItemId}){
+    if(_orderList.any((order) => order.status == OrderStatus.Editing))
+    {
+      int index = _orderList.indexWhere((element) => element.status == OrderStatus.Editing);
+      Order order = _orderList[index];
+      if(order.orderItems.any((order) => order.menuItem.id == menuItemId)) {
+        order.orderItems.removeWhere((item) => item.menuItem.id == menuItemId);
+        if(order.orderItems.isEmpty)
+          {
+            _orderList.removeAt(index);
+          }
+        else
+          {
+            _orderList[index] = order;
+          }
+      }
+      listenableOrderList.assignAll(_orderList);
     }
   }
 
-  Future<void>completeOrder() async {
-    try{
-      List<Map<String,dynamic>> orderDataMapList = _orderList.map<Map<String, dynamic>>((order) => order.toMap()).toList();
-      await _orderDataNetworkController.sendOrder(mapList : orderDataMapList);
-    }catch(e){
-      rethrow;
+  Future<void> completeOrder() async
+  {
+    print("Called");
+    //TODO: update to Pending Status
+    if(_orderList.any((order) => order.status == OrderStatus.Editing))
+    {
+      int index = _orderList.indexWhere((element) => element.status == OrderStatus.Editing);
+      Order order = _orderList[index];
+      try{
+        order.status = OrderStatus.Pending;
+        order.orderItems.forEach((orderItem) {
+          orderItem.status = OrderItemStatus.Pending;
+        });
+        _orderList[index] = order;
+      }
+      catch(e){
+        print(e.toString());
+        rethrow;
+      }
+      listenableOrderList.assignAll(_orderList);
+      update();
     }
+    else
+      {
+        throw Exception('No order to complete');
+      }
   }
 }
