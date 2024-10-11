@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:virtual_waiter/components/action_button.dart';
-import 'package:virtual_waiter/components/order_tile.dart';
+import 'package:virtual_waiter/components/order_item_tile.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/data/menu_data_controller.dart';
 import 'package:virtual_waiter/controller/data/table_data_controller.dart';
@@ -37,7 +37,7 @@ class OrderScreen {
           ),
           padding: EdgeInsets.all(20.0),
           child: GetBuilder<OssController>(builder: (cont) {
-            bool isOrderEmpty = cont.orderMenuItems.isEmpty;
+            bool isOrderEmpty = cont.orderItems.isEmpty;
             return isOrderEmpty
                 ? Column(
                     children: [
@@ -106,30 +106,21 @@ class OrderScreen {
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
-                            children: _ossController.orderMenuItems
+                            children: _ossController.orderItems
                                 .map(
-                                  (item) => OrderTile(
-                                    itemCategory: item.itemCategory,
-                                    menuItemId: item.menuItemId,
-                                    menuItemName: item.menuItemName,
-                                    menuItemImageUrl: item.menuItemImageUrl,
-                                    itemQuantity: item.itemQuantity,
-                                    addOns: item.addOnList,
-                                    totalAmount: item.totalAmount,
+                                  (item) => OrderItemTile(
+                                    orderItem: item,
                                     onEditPressed: () {
-                                      OrderItem orderItem = _ossController.findOrderItemByMenuItemId(id: item.menuItemId);
-                                      VmisStateController.instance.initByOrderItem(orderItem: orderItem);
+                                      VmisStateController.instance.initByOrderItem(orderItem: item);
                                       Get.to(() =>
                                         ViewMenuItemScreen(
-                                          menuItem: MenuDataController.instance
-                                              .findItemById(
-                                                  id: item.menuItemId),
+                                          menuItem: item.menuItem,
                                         ),
                                       );
                                     },
                                     onDeletePressed: () {
                                       cont.removeOrderItem(
-                                          menuItemId: item.menuItemId);
+                                          menuItemId: item.menuItem.id);
                                     },
                                   ),
                                 )
@@ -210,6 +201,7 @@ class OrderScreen {
                             Get.offAll(() => WaitingScreen());
                           }catch(e){
                             //Add error dialog here
+                            print(e.toString());
                           }
                         },
                         width: 250,
