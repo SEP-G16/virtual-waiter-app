@@ -1,48 +1,50 @@
+import 'package:virtual_waiter/model/menu_item.dart';
+import 'package:virtual_waiter/model/selected_add_on.dart';
+
 import '../enums/order_item_status.dart';
 
 class OrderItem {
-  final String menuItemId;
+  final MenuItem menuItem;
   final int itemQuantity;
-  final Map<String, int> addOnsQuantity;
+  final List<SelectedAddOn> selectedAddOns;
   String? additionalNote;
   final double totalAmount;
-  final OrderItemStatus status;
+  OrderItemStatus _status = OrderItemStatus.Editing;
 
   OrderItem({
-    required this.menuItemId,
+    required this.menuItem,
     required this.itemQuantity,
-    required this.addOnsQuantity,
+    required this.selectedAddOns,
     this.additionalNote,
     required this.totalAmount,
-    this.status = OrderItemStatus.Pending
-  });
+    required OrderItemStatus status,
+  }) : _status = status;
 
-  @override
-  String toString() {
-    return 'OrderItem{menuItemId: $menuItemId, itemQuantity: $itemQuantity, addOnsQuantity: $addOnsQuantity, additionalNote: $additionalNote, totalAmount: $totalAmount}';
-  }
+  OrderItemStatus get status => _status;
+  set status(OrderItemStatus status) => _status = status;
 
   OrderItem copyWith({
-    String? menuItemId,
+    MenuItem? menuItem,
     int? itemQuantity,
-    Map<String, int>? addOnsQuantity,
+    List<SelectedAddOn>? selectedAddOns,
     String? additionalNote,
     double? totalAmount,
+    OrderItemStatus? status,
   }) {
     return OrderItem(
-      menuItemId: menuItemId ?? this.menuItemId,
+      menuItem: menuItem ?? this.menuItem,
       itemQuantity: itemQuantity ?? this.itemQuantity,
-      addOnsQuantity: addOnsQuantity ?? this.addOnsQuantity,
+      selectedAddOns: selectedAddOns ?? this.selectedAddOns,
       additionalNote: additionalNote ?? this.additionalNote,
-      totalAmount: totalAmount ?? this.totalAmount,
+      totalAmount: totalAmount ?? this.totalAmount, status: status ?? OrderItemStatus.Editing,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'menuItemId': menuItemId,
+      'menuItemId': menuItem.toMap(),
       'itemQuantity': itemQuantity,
-      'addOnsQuantity': addOnsQuantity,
+      'selectedAddOns': selectedAddOns.map((x) => x.toMap()).toList(),
       'additionalNote': additionalNote,
       'totalAmount': totalAmount,
     };
