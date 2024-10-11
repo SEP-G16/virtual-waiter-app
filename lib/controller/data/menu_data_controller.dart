@@ -14,17 +14,31 @@ class MenuDataController extends GetxController {
   final MenuDataNetworkController _mdnc = MenuDataNetworkController.instance;
   static MenuDataController instance = Get.find();
 
-  @override
-  void onInit() {
-    // TODO: implement onInit
-    super.onInit();
-    _initControllerData();
+  MenuDataController._();
+
+  static Future<MenuDataController> create() async {
+    MenuDataController controller = MenuDataController._();
+    await controller._initControllerData();
+    return controller;
   }
 
-  void _initControllerData() {
-    _categoryItemMap = _mdnc.menuData;
-    if (_categoryItemMap.entries.isEmpty) {
-      throw Exception('Empty Menu in MenuDataController');
+
+  Future<void> _initControllerData() async {
+    await _getMenuData();
+  }
+
+  Future<void> _getMenuData() async {
+    List<Map<String, dynamic>> menuData = await _mdnc.getMenuData();
+    _categoryItemMap = {};
+    _allItems = [];
+    for (var item in menuData) {
+      MenuItem menuItem = MenuItem.fromMap(item);
+      _allItems.add(menuItem);
+      if (_categoryItemMap.containsKey(menuItem.category.name)) {
+        _categoryItemMap[menuItem.category.name].add(menuItem.toMap());
+      } else {
+        _categoryItemMap[menuItem.category.name] = [menuItem.toMap()];
+      }
     }
 
     for (var entry in _categoryItemMap.entries) {
@@ -33,7 +47,7 @@ class MenuDataController extends GetxController {
 
       if (categoryItems.isNotEmpty) {
         List<MenuItem> _items = categoryItems.map((item) {
-          MenuItem menuItem = MenuItem.fromJson(item);
+          MenuItem menuItem = MenuItem.fromMap(item);
           _allItems.add(menuItem);
           return menuItem;
         }).toList();
@@ -43,7 +57,7 @@ class MenuDataController extends GetxController {
     }
   }
 
-  MenuItem findItemById({required String id}) {
+  MenuItem findItemById({required int id}) {
     if(_allItems.any((item) => item.id == id)){
       return _allItems.where((item) => item.id == id).toList().first;
     }
@@ -52,4 +66,6 @@ class MenuDataController extends GetxController {
         throw Exception('Item Not Found');
       }
   }
+
+
 }
