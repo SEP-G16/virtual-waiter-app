@@ -98,5 +98,12 @@ flutter:
     - family: Altone Trial
       fonts:
         - asset: fonts/Altone-Trial-Regular.ttf
+    - family: Roundelay
+      fonts:
+        - asset: fonts/Roundelay-Regular.ttf
+          weight: 500
+        - asset: fonts/Roundelay-SemiBold.ttf
+          weight: 600
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
