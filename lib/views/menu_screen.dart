@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:virtual_waiter/components/action_button.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
+import 'package:virtual_waiter/controller/data/order_data_controller.dart';
 import 'package:virtual_waiter/controller/views/menu_screen/menu_widget_tree_builder.dart';
+import 'package:virtual_waiter/enums/order_status.dart';
+import 'package:virtual_waiter/views/waiting_screen.dart';
 
 import 'configure_screen.dart';
 import 'order_screen.dart';
@@ -25,7 +28,11 @@ class MenuScreen extends StatelessWidget {
               //   title: 'Settings',
               //   onPressed: () {},
               // ),
-              Text('Welcome to Virtual Waiter', style: TextConstants.mainTextStyle(fontSize: 30), textAlign: TextAlign.center,),
+              Text(
+                'Welcome to Virtual Waiter',
+                style: TextConstants.mainTextStyle(fontSize: 30),
+                textAlign: TextAlign.center,
+              ),
               GestureDetector(
                 onTap: () => Get.to(() => ConfigureScreen()),
                 child: Container(
@@ -112,11 +119,22 @@ class MenuScreen extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: GestureDetector(
-                        onTap: () {
-                          OrderScreen();
-                        },
-                        child: Icon(Icons.room_service_outlined)),
+                    child: Obx(() {
+                      bool onlyEditableOrder = OrderDataController
+                          .instance.listenableOrderList.length == 1 && OrderDataController
+                          .instance.listenableOrderList.first.status == OrderStatus.Editing;
+
+                      bool noItemsHaveBeenAddedYet = OrderDataController
+                          .instance.listenableOrderList.isEmpty;
+
+                      return GestureDetector(
+                          onTap: () {
+                            onlyEditableOrder || noItemsHaveBeenAddedYet
+                                ? OrderScreen()
+                                : Get.to(() => WaitingScreen());
+                          },
+                          child: Icon(Icons.room_service_outlined));
+                    }),
                   ),
                 ],
               ),
