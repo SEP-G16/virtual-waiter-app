@@ -1,25 +1,31 @@
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 import 'package:virtual_waiter/controller/data/menu_data_controller.dart';
-import 'package:virtual_waiter/controller/data/order_data_controller.dart';
+import 'package:virtual_waiter/controller/data/order_item_data_controller.dart';
+import 'package:virtual_waiter/enums/order_item_status.dart';
 import 'package:virtual_waiter/model/menu_item.dart';
 import 'package:virtual_waiter/model/order_item.dart';
+
+import '../../../model/selected_add_on.dart';
 
 //vmis -view menu item screen
 class VmisStateController extends GetxController {
   static VmisStateController instance = Get.find();
 
   final MenuDataController _menuDataController = MenuDataController.instance;
-  final OrderDataController _orderDataController = OrderDataController.instance;
+  final OrderItemDataController _orderListDataController = OrderItemDataController.instance;
 
-  Map<String, int> _selectedAddOnsDataMap = {};
-  Map<String, RxInt> _selectedAddOnsQuantityMap = {};
+  Map<int, int> _selectedAddOnsDataMap = {};
+  Map<int, RxInt> _selectedAddOnsQuantityMap = {};
 
   RxBool _editingMode = false.obs;
+
   bool get editingMode => _editingMode.value;
 
   MenuItem? _menuItem;
+
   MenuItem get menuItem => _menuItem!;
+
   set menuItem(MenuItem item) {
     _menuItem = item;
     _selectedAddOnsDataMap = {};
@@ -28,17 +34,22 @@ class VmisStateController extends GetxController {
   }
 
   RxInt _quantity = 1.obs;
+
   int get quantity => _quantity.value;
+
   set quantity(int newQuantity) {
     _quantity.value = quantity;
     update();
   }
 
   RxDouble _totalAmount = 0.0.obs;
+
   double get totalAmount => _totalAmount.value;
 
   String? _additionalNotes = '';
+
   String? get additionalNotes => _additionalNotes;
+
   set additionalNotes(String? value) => _additionalNotes = value;
 
   void itemNotNullCheck() {
@@ -60,7 +71,7 @@ class VmisStateController extends GetxController {
     itemNotNullCheck();
     int curr = _quantity.value;
 
-    for (String addOnId in _selectedAddOnsQuantityMap.keys) {
+    for (int addOnId in _selectedAddOnsQuantityMap.keys) {
       int addOnQuantity = _selectedAddOnsQuantityMap[addOnId]!.value;
       if (curr > 1 && curr == addOnQuantity) {
         addOnQuantity--;
@@ -85,19 +96,19 @@ class VmisStateController extends GetxController {
     _editingMode.value = false;
   }
 
-  void addAddOnToDataMap({required String addOnId}) {
+  void addAddOnToDataMap({required int addOnId}) {
     itemNotNullCheck();
     _selectedAddOnsQuantityMap[addOnId] = 1.obs;
     _calculateTotal();
   }
 
-  void removeAddOnFromDataMap({required String addOnId}) {
+  void removeAddOnFromDataMap({required int addOnId}) {
     itemNotNullCheck();
     _selectedAddOnsQuantityMap.remove(addOnId);
     _calculateTotal();
   }
 
-  void incrementAddOnQuantity({required String addOnId}) {
+  void incrementAddOnQuantity({required int addOnId}) {
     itemNotNullCheck();
     int currAddOnQuantity = _selectedAddOnsQuantityMap[addOnId]!.value;
     if (currAddOnQuantity < _quantity.value) {
@@ -108,7 +119,7 @@ class VmisStateController extends GetxController {
     }
   }
 
-  void decrementAddOnQuantity({required String addOnId}) {
+  void decrementAddOnQuantity({required int addOnId}) {
     itemNotNullCheck();
     int currAddOnQuantity = _selectedAddOnsQuantityMap[addOnId]!.value;
     if (currAddOnQuantity > 1) {
@@ -119,7 +130,7 @@ class VmisStateController extends GetxController {
     }
   }
 
-  int getAddOnQuantityValue({required String addOnId}) {
+  int getAddOnQuantityValue({required int addOnId}) {
     return _selectedAddOnsQuantityMap[addOnId]!.value;
   }
 
@@ -127,12 +138,13 @@ class VmisStateController extends GetxController {
     itemNotNullCheck();
     double totalBasePrice = menuItem.price * _quantity.value;
     double totalAddOnPrice = 0.0;
-    for (String addOnId in _selectedAddOnsQuantityMap.keys) {
+    for (int addOnId in _selectedAddOnsQuantityMap.keys) {
       int addOnQuantity = _selectedAddOnsQuantityMap[addOnId]!.value;
       double addOnPrice = menuItem.addOns
-          .where((addOn) => addOn['id'] == addOnId)
+          .where((addOn) => addOn.id == addOnId)
           .toList()
-          .first['price'];
+          .first
+          .price;
       totalAddOnPrice += addOnQuantity * addOnPrice;
     }
     _totalAmount.value = totalAddOnPrice + totalBasePrice;
@@ -141,7 +153,7 @@ class VmisStateController extends GetxController {
   void _fillSelectedAddOnsDataMap() {
     _selectedAddOnsDataMap = {};
     for (var entry in _selectedAddOnsQuantityMap.entries) {
-      String addOnId = entry.key;
+      int addOnId = entry.key;
       int addOnQuantity = entry.value.value;
       _selectedAddOnsDataMap[addOnId] = addOnQuantity;
     }
@@ -150,11 +162,22 @@ class VmisStateController extends GetxController {
   void addOrder() {
     itemNotNullCheck();
     _fillSelectedAddOnsDataMap();
-    _orderDataController.addOrderItem(
+    _orderListDataController.addOrderItem(
       orderItem: OrderItem(
-        menuItemId: menuItem.id,
+        status: OrderItemStatus.Editing,
+        menuItem: menuItem,
         itemQuantity: _quantity.value,
-        addOnsQuantity: _selectedAddOnsDataMap,
+        selectedAddOns: _selectedAddOnsDataMap.entries.map((entry) {
+          int addOnId = entry.key;
+          int addOnQuantity = entry.value;
+          return SelectedAddOn(
+            addOn: menuItem.addOns
+                .where((addOn) => addOn.id == addOnId)
+                .toList()
+                .first,
+            quantity: addOnQuantity,
+          );
+        }).toList(),
         additionalNote: _additionalNotes,
         totalAmount: totalAmount,
       ),
@@ -162,33 +185,44 @@ class VmisStateController extends GetxController {
   }
 
   void initByOrderItem({required OrderItem orderItem}) {
-    _menuItem = _menuDataController.findItemById(id: orderItem.menuItemId);
+    _menuItem = orderItem.menuItem;
     itemNotNullCheck();
     _editingMode.value = true;
     _quantity.value = orderItem.itemQuantity;
     _additionalNotes = orderItem.additionalNote;
-    orderItem.addOnsQuantity.keys.forEach((addOnId) {
-      _selectedAddOnsQuantityMap[addOnId] = 1.obs;
-      _selectedAddOnsQuantityMap[addOnId]!.value =
-          orderItem.addOnsQuantity[addOnId]!;
-    });
+    for (SelectedAddOn selectedAddOn in orderItem.selectedAddOns) {
+      _selectedAddOnsQuantityMap[selectedAddOn.addOn.id] = 1.obs;
+      _selectedAddOnsQuantityMap[selectedAddOn.addOn.id]!.value =
+          selectedAddOn.quantity;
+    }
     _totalAmount.value = orderItem.totalAmount;
   }
 
-  bool checkAddOnAlreadyAdded({required String addOnId}) {
+  bool checkAddOnAlreadyAdded({required int addOnId}) {
     return _selectedAddOnsQuantityMap.keys.any((id) => id == addOnId);
   }
 
   void updateOrder() {
     itemNotNullCheck();
-    if (_orderDataController.orderAlreadyExists(menuItemId: _menuItem!.id)) {
-      _orderDataController.removeOrderItem(menuItemId: _menuItem!.id);
+    if (_orderListDataController.orderItemAlreadyExists(menuItemId: _menuItem!.id)) {
+      _orderListDataController.removeOrderItem(menuItemId: _menuItem!.id);
       _fillSelectedAddOnsDataMap();
-      _orderDataController.addOrderItem(orderItem:
-        OrderItem(
-          menuItemId: menuItem!.id,
+      _orderListDataController.addOrderItem(
+        orderItem: OrderItem(
+          status: OrderItemStatus.Editing,
+          menuItem: menuItem,
           itemQuantity: _quantity.value,
-          addOnsQuantity: _selectedAddOnsDataMap,
+          selectedAddOns: _selectedAddOnsDataMap.entries.map((entry){
+            int addOnId = entry.key;
+            int addOnQuantity = entry.value;
+            return SelectedAddOn(
+              addOn: menuItem.addOns
+                  .where((addOn) => addOn.id == addOnId)
+                  .toList()
+                  .first,
+              quantity: addOnQuantity,
+            );
+          }).toList(),
           totalAmount: _totalAmount.value,
         ),
       );
