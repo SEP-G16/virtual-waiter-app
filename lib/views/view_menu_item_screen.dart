@@ -415,10 +415,10 @@ class ViewMenuItemScreen extends StatelessWidget {
                                         children: menuItem.addOns
                                             .map<Widget>((addOn) {
                                           String heightAnimatorTag =
-                                              'add-on-animator-${addOn['id']}';
+                                              'add-on-animator-${menuItem.id}-${addOn.id}';
 
                                           String iconAnimatorTag =
-                                              'add-on-icon-animator-${addOn['id']}';
+                                              'add-on-icon-animator-${menuItem.id}-${addOn.id}';
                                           Get.put(
                                               AddOnsHeightAnimationController(
                                                   endHeight: 80),
@@ -431,7 +431,7 @@ class ViewMenuItemScreen extends StatelessWidget {
                                           //checking if already inited(editing order)
                                           if (_vmisStateController
                                               .checkAddOnAlreadyAdded(
-                                                  addOnId: addOn['id'])) {
+                                                  addOnId: addOn.id)) {
                                             final heightAnimCont = Get.find<
                                                     AddOnsHeightAnimationController>(
                                                 tag: heightAnimatorTag);
@@ -481,7 +481,7 @@ class ViewMenuItemScreen extends StatelessWidget {
                                                                       .spaceBetween,
                                                               children: [
                                                                 Text(
-                                                                  addOn['name'],
+                                                                  addOn.name,
                                                                   style: TextConstants
                                                                       .subTextStyle(
                                                                           fontSize:
@@ -507,7 +507,7 @@ class ViewMenuItemScreen extends StatelessWidget {
                                                                 ),
                                                               ),
                                                               Text(
-                                                                '\$${addOn['price'].toStringAsFixed(2)}',
+                                                                '\$${addOn.price.toStringAsFixed(2)}',
                                                                 style: TextConstants
                                                                     .subTextStyle(
                                                                         fontSize:
@@ -555,7 +555,7 @@ class ViewMenuItemScreen extends StatelessWidget {
                                                                   _vmisStateController
                                                                       .addAddOnToDataMap(
                                                                           addOnId:
-                                                                              addOn['id']);
+                                                                              addOn.id);
                                                                 } else {
                                                                   iconAnimCont
                                                                           .isAddIcon =
@@ -563,7 +563,7 @@ class ViewMenuItemScreen extends StatelessWidget {
                                                                   _vmisStateController
                                                                       .removeAddOnFromDataMap(
                                                                           addOnId:
-                                                                              addOn['id']);
+                                                                              addOn.id);
                                                                 }
                                                               },
                                                               child:
@@ -670,18 +670,18 @@ class ViewMenuItemScreen extends StatelessWidget {
                                                                   value: _vmisStateController
                                                                       .getAddOnQuantityValue(
                                                                           addOnId:
-                                                                              addOn['id']),
+                                                                              addOn.id),
                                                                   onAddPressed:
                                                                       () {
                                                                     _vmisStateController.incrementAddOnQuantity(
                                                                         addOnId:
-                                                                            addOn['id']);
+                                                                            addOn.id);
                                                                   },
                                                                   onSubtractPress:
                                                                       () {
                                                                     _vmisStateController.decrementAddOnQuantity(
                                                                         addOnId:
-                                                                            addOn['id']);
+                                                                            addOn.id);
                                                                   },
                                                                 ),
                                                               ),
