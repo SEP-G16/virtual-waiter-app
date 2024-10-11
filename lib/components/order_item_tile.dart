@@ -1,33 +1,26 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_common/get_reset.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/network/web_socket_controller.dart';
+import 'package:virtual_waiter/enums/order_item_status.dart';
+import 'package:virtual_waiter/model/order_item.dart';
 
-class OrderTile extends StatelessWidget {
-  const OrderTile({
-    required this.itemCategory,
-    required this.menuItemId,
-    required this.menuItemName,
-    required this.menuItemImageUrl,
-    required this.itemQuantity,
-    required this.addOns,
-    required this.totalAmount,
-    required this.onEditPressed,
-    required this.onDeletePressed,
+class OrderItemTile extends StatelessWidget {
+  OrderItemTile({
+    required this.orderItem,
+    this.onEditPressed,
+    this.onDeletePressed,
   });
-
-  final String itemCategory;
-  final String menuItemId;
-  final String menuItemName;
-  final String menuItemImageUrl;
-  final int itemQuantity;
-  final List<String> addOns;
-  final double totalAmount;
-  final Function() onEditPressed;
-  final Function() onDeletePressed;
+  Function()? onEditPressed;
+  Function()? onDeletePressed;
+  final OrderItem orderItem;
 
   String _generateAddOnText() {
+    List<String> addOns = [];
+    addOns.addAll(orderItem.selectedAddOns
+        .map((selectedAddOn) => selectedAddOn.addOn.name));
     String subtext = '';
     if (addOns.isNotEmpty) {
       if (addOns.length == 1) {
@@ -50,7 +43,10 @@ class OrderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0,),
+      padding: EdgeInsets.symmetric(
+        vertical: 10.0,
+        horizontal: 20.0,
+      ),
       margin: EdgeInsets.symmetric(vertical: 10.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -85,7 +81,7 @@ class OrderTile extends StatelessWidget {
                 fit: BoxFit.cover,
                 width: 80.0,
                 height: 80.0,
-                imageUrl: menuItemImageUrl,
+                imageUrl: orderItem.menuItem.imageUrl,
               ),
             ),
           ),
@@ -93,21 +89,21 @@ class OrderTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                itemCategory,
+                orderItem.menuItem.category.name,
                 style: TextConstants.subTextStyle(fontSize: 18),
               ),
               Text(
-                menuItemName,
+                orderItem.menuItem.name,
                 style: TextConstants.mainTextStyle(fontSize: 24),
               ),
               RichText(
                 text: TextSpan(
-                    text: '×',
+                    text: 'x ',
                     style: TextConstants.subTextStyle(
                         fontSize: 24, textColor: Colors.black),
                     children: [
                       TextSpan(
-                        text: '${itemQuantity}',
+                        text: '${orderItem.itemQuantity}',
                         style: TextConstants.subTextStyle(
                             fontSize: 20, textColor: Colors.black),
                       ),
@@ -121,40 +117,61 @@ class OrderTile extends StatelessWidget {
             ],
           ),
           Spacer(),
-          Row(
-            children: [
-              GestureDetector(
-                onTap: onEditPressed,
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.all(2.5),
+          orderItem.status != OrderItemStatus.Editing
+              ? Container(
+                  margin: EdgeInsets.only(right: 15),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.green, width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
+                    color: orderItem.status == OrderItemStatus.Pending
+                        ? Colors.black
+                        : orderItem.status == OrderItemStatus.Processing
+                            ? Colors.amber
+                            : Colors.green,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    Icons.edit,
-                    color: Colors.green,
+                  child: Text(
+                    orderItem.status.toStringAsName(),
+                    style: TextConstants.subTextStyle(
+                      fontSize: 20,
+                      textColor: Colors.white
+                    ),
                   ),
+                )
+              : Row(
+                  children: [
+                    GestureDetector(
+                      onTap: onEditPressed,
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        margin: EdgeInsets.all(2.5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.green, width: 2.0),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Icon(
+                          Icons.edit,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: onDeletePressed,
+                      child: Container(
+                        padding: EdgeInsets.all(5),
+                        margin: EdgeInsets.all(2.5),
+                        decoration: BoxDecoration(
+                          border:
+                              Border.all(color: Colors.redAccent, width: 2.0),
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              GestureDetector(
-                onTap: onDeletePressed,
-                child: Container(
-                  padding: EdgeInsets.all(5),
-                  margin: EdgeInsets.all(2.5),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.redAccent, width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Icon(
-                    Icons.delete,
-                    color: Colors.redAccent,
-                  ),
-                ),
-              ),
-            ],
-          ),
           Container(
             alignment: Alignment.centerRight,
             width: 120.0,
@@ -174,7 +191,7 @@ class OrderTile extends StatelessWidget {
                     ),
                   ),
                   TextSpan(
-                    text: '${totalAmount.toStringAsFixed(2)}',
+                    text: orderItem.totalAmount.toStringAsFixed(2),
                     style: TextConstants.subTextStyle(
                       fontSize: 30,
                       textColor: Colors.black,
