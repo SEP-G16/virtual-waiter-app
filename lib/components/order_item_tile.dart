@@ -12,10 +12,13 @@ class OrderItemTile extends StatelessWidget {
     required this.orderItem,
     this.onEditPressed,
     this.onDeletePressed,
+    this.pendingPaymentMode = false,
   });
+
   Function()? onEditPressed;
   Function()? onDeletePressed;
   final OrderItem orderItem;
+  bool pendingPaymentMode;
 
   String _generateAddOnText() {
     List<String> addOns = [];
@@ -79,8 +82,8 @@ class OrderItemTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(10.0),
               child: CachedNetworkImage(
                 fit: BoxFit.cover,
-                width: 80.0,
-                height: 80.0,
+                width: pendingPaymentMode ? 50 : 80.0,
+                height: pendingPaymentMode ? 50 : 80.0,
                 imageUrl: orderItem.menuItem.imageUrl,
               ),
             ),
@@ -88,9 +91,12 @@ class OrderItemTile extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                orderItem.menuItem.category.name,
-                style: TextConstants.subTextStyle(fontSize: 18),
+              Visibility(
+                visible: !pendingPaymentMode,
+                child: Text(
+                  orderItem.menuItem.category.name,
+                  style: TextConstants.subTextStyle(fontSize: 18),
+                ),
               ),
               Text(
                 orderItem.menuItem.name,
@@ -117,61 +123,70 @@ class OrderItemTile extends StatelessWidget {
             ],
           ),
           Spacer(),
-          orderItem.status != OrderItemStatus.Editing
-              ? Container(
-                  margin: EdgeInsets.only(right: 15),
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: orderItem.status == OrderItemStatus.Pending
-                        ? Colors.black
-                        : orderItem.status == OrderItemStatus.Processing
-                            ? Colors.amber
-                            : Colors.green,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    orderItem.status.toStringAsName(),
-                    style: TextConstants.subTextStyle(
-                      fontSize: 20,
-                      textColor: Colors.white
-                    ),
-                  ),
-                )
-              : Row(
-                  children: [
-                    GestureDetector(
-                      onTap: onEditPressed,
-                      child: Container(
-                        padding: EdgeInsets.all(5),
-                        margin: EdgeInsets.all(2.5),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.green, width: 2.0),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.green,
-                        ),
+          Builder(
+            builder: (context) {
+              if (pendingPaymentMode) {
+                return SizedBox();
+              }
+              return orderItem.status != OrderItemStatus.Editing
+                  ? Container(
+                      margin: EdgeInsets.only(right: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: orderItem.status == OrderItemStatus.Pending
+                            ? Colors.black
+                            : orderItem.status == OrderItemStatus.Processing
+                                ? Colors.amber
+                                : orderItem.status == OrderItemStatus.Complete
+                                    ? Colors.green
+                                    : Colors.red,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: onDeletePressed,
-                      child: Container(
-                        padding: EdgeInsets.all(5),
-                        margin: EdgeInsets.all(2.5),
-                        decoration: BoxDecoration(
-                          border:
-                              Border.all(color: Colors.redAccent, width: 2.0),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Icon(
-                          Icons.delete,
-                          color: Colors.redAccent,
-                        ),
+                      child: Text(
+                        orderItem.status.toStringAsName(),
+                        style: TextConstants.subTextStyle(
+                            fontSize: 20, textColor: Colors.white),
                       ),
-                    ),
-                  ],
-                ),
+                    )
+                  : Row(
+                      children: [
+                        GestureDetector(
+                          onTap: onEditPressed,
+                          child: Container(
+                            padding: EdgeInsets.all(5),
+                            margin: EdgeInsets.all(2.5),
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.green, width: 2.0),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: onDeletePressed,
+                          child: Container(
+                            padding: EdgeInsets.all(5),
+                            margin: EdgeInsets.all(2.5),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Colors.redAccent, width: 2.0),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            child: Icon(
+                              Icons.delete,
+                              color: Colors.redAccent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+            },
+          ),
           Container(
             alignment: Alignment.centerRight,
             width: 120.0,
