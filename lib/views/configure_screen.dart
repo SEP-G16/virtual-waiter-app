@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 import 'package:virtual_waiter/components/action_button.dart';
+import 'package:virtual_waiter/components/loading_dialog.dart';
+import 'package:virtual_waiter/components/message_dialog_box.dart';
 import 'package:virtual_waiter/components/named_input_field.dart';
 import 'package:virtual_waiter/constants/pinput_theme_constants.dart';
+import 'package:virtual_waiter/controller/data/table_data_controller.dart';
 import 'package:virtual_waiter/views/loading_screen.dart';
+import 'package:virtual_waiter/views/qr_code_scanner.dart';
 
 import '../constants/text_constants.dart';
 
 class ConfigureScreen extends StatelessWidget {
-  ConfigureScreen({super.key});
+  ConfigureScreen({this.withPin = true});
+
+  bool withPin;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return !withPin ? _ConfigureScreen() : Scaffold(
       backgroundColor: Colors.white,
       body: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
@@ -31,10 +37,11 @@ class ConfigureScreen extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: IconButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              icon: Icon(Icons.arrow_back_ios_new_rounded),),
+                            onPressed: () {
+                              Get.back();
+                            },
+                            icon: Icon(Icons.arrow_back_ios_new_rounded),
+                          ),
                         ),
                         Align(
                           alignment: Alignment.center,
@@ -56,13 +63,14 @@ class ConfigureScreen extends StatelessWidget {
                     pinputAutovalidateMode: PinputAutovalidateMode.onSubmit,
                     showCursor: true,
                     onCompleted: (pin) {
-                      if(pin == '1610')
-                        {
-                          Get.to(() => _ConfigureScreen());
-                        }
+                      if (pin == '1610') {
+                        Get.to(() => _ConfigureScreen());
+                      }
                     },
                   ),
-                  SizedBox(height: 100,),
+                  SizedBox(
+                    height: 100,
+                  ),
                 ],
               ),
             ),
@@ -82,45 +90,77 @@ class _ConfigureScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                        onPressed: () {
-                          Get.offAll(LoadingScreen());
-                        },
-                        icon: Icon(Icons.arrow_back_ios_new_rounded)),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Configure Virtual Waiter',
-                      style: TextConstants.mainTextStyle(fontSize: 32),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Text(
+                'Configure Virtual Waiter',
+                style: TextConstants.mainTextStyle(fontSize: 32),
+              ),
+            ),
+            Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Scan QR code from Restaurant Manager Application\nto configure this Virtual Waiter',
+                      textAlign: TextAlign.center,
+                      style: TextConstants.subTextStyle(),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () {
+                    Get.to(
+                      () => QrCodeScanner(
+                        setResult: (result) async {
+                          bool isNumeric(String input) {
+                            RegExp regex = RegExp(r'^\d+$');
+                            return regex.hasMatch(input);
+                          }
+
+                          if (result == null) {
+                            MessageDialogBox(message: 'QR code not scanned');
+                            return;
+                          }
+
+                          if (!isNumeric(result)) {
+                            MessageDialogBox(message: 'Invalid QR code');
+                            return;
+                          }
+
+                          int scannedId = int.parse(result);
+
+                          LoadingDialog(
+                            callerFunction: () async {
+                              await TableDataController.instance.configureTable(
+                                scannedId,
+                              );
+                            },
+                            onSuccessCallBack: () {
+                              MessageDialogBox(
+                                  message: 'Table configured successfully');
+                            },
+                            onErrorCallBack: (error) {
+                              MessageDialogBox(message: error.toString());
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.qr_code_scanner_outlined),
+                  iconSize: 100,
+                  color: Colors.black,
+                ),
+              ],
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Row(
-                children: [
-                  NamedInputField(
-                    titleText: 'Edit Table No.',
-                    onChanged: (value) {},
-                  ),
-                ],
-              ),
-            ),
-            Spacer(),
             Padding(
               padding: EdgeInsets.all(40.0),
               child: ActionButton(
-                title: 'Save',
+                title: 'Done',
                 onPressed: () {
                   Get.offAll(() => LoadingScreen());
                 },
