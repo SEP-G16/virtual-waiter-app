@@ -1,50 +1,48 @@
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
+
+import '../constants/text_constants.dart';
+import 'action_button.dart';
 
 class MessageDialogBox {
   final String message;
-  Color borderColor;
-  double borderRadius;
-  double height;
-  double width;
-  double fontSize;
-  bool barrierDismissible;
-  Color backgroundColor;
-  Color textColor;
+  String? btnText;
+  void Function()? onTap;
 
-  MessageDialogBox({
-    required this.message,
-    this.borderColor = Colors.indigoAccent,
-    this.backgroundColor = Colors.white,
-    this.textColor = Colors.black,
-    this.borderRadius = 10.0,
-    this.height = 100.0,
-    this.width = 200.0,
-    this.fontSize = 30,
-    this.barrierDismissible = true,
-  }) {
+  MessageDialogBox({required this.message, this.onTap, this.btnText}) {
+    _showDialog();
+  }
+
+  void _showDialog() {
     Get.dialog(
-        Dialog(
-          child: Container(
-            height: height,
-            width: width,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(borderRadius),
-              border: Border.all(color: borderColor),
-            ),
-            child: Center(
-              child: Text(
+      Dialog(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
                 message,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  color: textColor,
-                ),
+                style: TextConstants.subTextStyle(),
               ),
-            ),
+              SizedBox(
+                height: 20,
+              ),
+              ActionButton(
+                title: btnText ?? 'OK',
+                onPressed: onTap ?? () {
+                  Get.back();
+                },
+              ),
+            ],
           ),
         ),
-        barrierDismissible: barrierDismissible);
+      ),
+    );
   }
 }
