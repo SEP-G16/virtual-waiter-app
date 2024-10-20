@@ -18,7 +18,6 @@ class RequestHelpButton extends StatelessWidget {
         } catch (e) {
           MessageDialogBox(
             message: 'An unexpected error occurred!',
-            borderColor: Colors.redAccent,
           );
         }
       },
