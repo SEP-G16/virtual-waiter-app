@@ -164,6 +164,7 @@ class VmisStateController extends GetxController {
     _fillSelectedAddOnsDataMap();
     _orderListDataController.addOrderItem(
       orderItem: OrderItem(
+        id: -1,
         status: OrderItemStatus.Editing,
         menuItem: menuItem,
         itemQuantity: _quantity.value,
@@ -209,6 +210,7 @@ class VmisStateController extends GetxController {
       _fillSelectedAddOnsDataMap();
       _orderListDataController.addOrderItem(
         orderItem: OrderItem(
+          id: -1,
           status: OrderItemStatus.Editing,
           menuItem: menuItem,
           itemQuantity: _quantity.value,
