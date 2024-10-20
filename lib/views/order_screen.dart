@@ -197,8 +197,8 @@ class OrderScreen {
                           try{
                             await _ossController.completeOrder();
                             Get.back();
-                            TableDataController.instance.waitingMode = true;
                             Get.offAll(() => WaitingScreen());
+                            await TableDataController.instance.updateWaitingStatus(true);
                           }catch(e){
                             //Add error dialog here
                             print(e.toString());
