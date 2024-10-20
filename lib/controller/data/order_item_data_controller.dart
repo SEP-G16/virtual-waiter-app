@@ -9,8 +9,6 @@ import '../network/order_data_network_controller.dart';
 class OrderItemDataController extends GetxController{
   static OrderItemDataController instance = Get.find();
 
-  final OrderDataNetworkController _orderDataNetworkController = OrderDataNetworkController.instance;
-
   final OrderDataController _odc = OrderDataController.instance;
 
   List<OrderItem> _orderItemList = [];
@@ -53,5 +51,11 @@ class OrderItemDataController extends GetxController{
     }catch(e){
       rethrow;
     }
+  }
+
+  void resetList() {
+    _orderItemList = [];
+    listenableOrderItemList.clear();
+    update();
   }
 }
