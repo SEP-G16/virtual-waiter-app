@@ -1,17 +1,27 @@
-import 'package:get/get.dart';
-import 'package:virtual_waiter/constants/menu_data_constants.dart';
+import 'dart:convert';
 
-import '../../model/menu_item.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:virtual_waiter/constants/network_constants.dart';
 
 class MenuDataNetworkController extends GetxController {
 
-  final List<MenuItem> _menuItems = MenuDataConstants.menuItems;
-
   static MenuDataNetworkController instance = Get.find();
 
-
   Future<List<Map<String, dynamic>>> getMenuData() async {
-    await Future.delayed(Duration(milliseconds: 100));
-    return _menuItems.map((item) => item.toMap()).toList();
+    try{
+      final response = await http.get(Uri.parse('${NetworkConstants.baseUrl}/api/menu/all'));
+      if(response.statusCode == 200){
+        List<Map<String, dynamic>> menuData = [];
+        for(Map<String, dynamic> data in jsonDecode(response.body)){
+          menuData.add(data);
+        }
+        return menuData;
+      }else{
+        throw Exception('Failed to load menu data');
+      }
+    }catch(e){
+      rethrow;
+    }
   }
 }
