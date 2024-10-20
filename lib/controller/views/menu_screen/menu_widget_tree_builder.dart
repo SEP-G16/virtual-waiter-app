@@ -5,6 +5,7 @@ import 'package:virtual_waiter/constants/text_constants.dart';
 import 'package:virtual_waiter/controller/data/menu_data_controller.dart';
 import 'package:virtual_waiter/controller/data/order_item_data_controller.dart';
 import 'package:virtual_waiter/controller/views/view_menu_item_screen/vmis_state_controller.dart';
+import 'package:virtual_waiter/enums/menu_item_status.dart';
 import 'package:virtual_waiter/model/menu_item.dart';
 import 'package:virtual_waiter/views/view_menu_item_screen.dart';
 
@@ -16,7 +17,8 @@ class MenuWidgetTreeBuilder extends GetxController {
 
   final VmisStateController _vmisStateController = VmisStateController.instance;
 
-  final OrderItemDataController _orderDataController = OrderItemDataController.instance;
+  final OrderItemDataController _orderDataController =
+      OrderItemDataController.instance;
 
   static MenuWidgetTreeBuilder instance = Get.find();
 
@@ -25,6 +27,13 @@ class MenuWidgetTreeBuilder extends GetxController {
     // TODO: implement onInit
     super.onInit();
     _buildMenuWidgetTree();
+  }
+
+  @override
+  void onReady() {
+    // TODO: implement onReady
+    super.onReady();
+    ever(_menuDataController.menuChangedListener, (_) => _buildMenuWidgetTree());
   }
 
   void _buildMenuWidgetTree() {
@@ -68,27 +77,29 @@ class MenuWidgetTreeBuilder extends GetxController {
         ),
       ));
       for (MenuItem item in items) {
-        _widgetList.add(
-          MenuItemTile(
-            item: item,
-            onPressed: () {
-              if(_orderDataController.orderItemAlreadyExists(menuItemId: item.id))
-                {
-                  _vmisStateController.initByOrderItem(orderItem: _orderDataController.findByMenuItemId(id: item.id));
-                }
-              else
-                {
+        if (item.status == MenuItemStatus.InStock) {
+          _widgetList.add(
+            MenuItemTile(
+              item: item,
+              onPressed: () {
+                if (_orderDataController.orderItemAlreadyExists(
+                    menuItemId: item.id)) {
+                  _vmisStateController.initByOrderItem(
+                      orderItem:
+                          _orderDataController.findByMenuItemId(id: item.id));
+                } else {
                   _vmisStateController.menuItem = item;
                 }
-              //setting menu item here instead of setting it in the ViewMenuItemScreen
-              Get.to(
-                () => ViewMenuItemScreen(
-                  menuItem: item,
-                ),
-              );
-            },
-          ),
-        );
+                //setting menu item here instead of setting it in the ViewMenuItemScreen
+                Get.to(
+                  () => ViewMenuItemScreen(
+                    menuItem: item,
+                  ),
+                );
+              },
+            ),
+          );
+        }
       }
     }
   }
