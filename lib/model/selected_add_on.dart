@@ -8,8 +8,10 @@ class SelectedAddOn{
 
   Map<String, dynamic> toMap(){
     return {
-      'addOn': addOn.toMap(),
+      'id': null,
+      'addOnId': addOn.id,
       'quantity': quantity,
     };
   }
+
 }
