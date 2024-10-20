@@ -1,13 +1,21 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:virtual_waiter/views/loading_screen.dart';
 
-import 'constants/menu_data_constants.dart';
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 void main() {
-  List<Map<String, String>> formattedTags = MenuDataConstants.getFormattedTags();
-  formattedTags.forEach((tag) => print(tag));
-  runApp(const VirtualWaiter());
+  HttpOverrides.global = MyHttpOverrides();
+  runApp(VirtualWaiter());
 }
 
 class VirtualWaiter extends StatelessWidget {
@@ -26,4 +34,3 @@ class VirtualWaiter extends StatelessWidget {
     );
   }
 }
-
