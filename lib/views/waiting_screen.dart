@@ -1,18 +1,12 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:virtual_waiter/components/action_button.dart';
 import 'package:virtual_waiter/components/order_item_tile.dart';
 import 'package:virtual_waiter/constants/svg_constants.dart';
 import 'package:virtual_waiter/constants/text_constants.dart';
-import 'package:virtual_waiter/constants/web_socket_constants.dart';
-import 'package:virtual_waiter/controller/data/order_data_controller.dart';
-import 'package:virtual_waiter/controller/data/order_item_data_controller.dart';
-import 'package:virtual_waiter/controller/data/stream_socket_controller.dart';
 import 'package:get/get.dart';
 import 'package:virtual_waiter/controller/views/waiting_screen_state_controller.dart';
 import 'package:virtual_waiter/enums/order_status.dart';
-import 'package:virtual_waiter/model/order_item.dart';
 import 'package:virtual_waiter/views/menu_screen.dart';
 import 'package:virtual_waiter/views/view_menu_item_screen.dart';
 
@@ -20,19 +14,36 @@ import '../controller/views/view_menu_item_screen/vmis_state_controller.dart';
 import '../model/order.dart';
 
 class WaitingScreen extends StatelessWidget {
-  const WaitingScreen({super.key});
+  WaitingScreen({super.key, this.previousSession = false});
+
+  bool previousSession;
 
   @override
   Widget build(BuildContext context) {
     Get.put(WaitingScreenStateController());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (previousSession && !WaitingScreenStateController.instance.snackBarDisplayed.value) {
+        Get.snackbar(
+          'A Previous Session Was Recovered',
+          'The app recovered a previous session',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        WaitingScreenStateController.instance.snackBarDisplayed.value = true;
+      }
 
+      // if (!WaitingScreenStateController.instance.dialogDisplayed.value) {
+        WaitingScreenStateController.instance.showPaymentDialogIfComplete();
+        WaitingScreenStateController.instance.dialogDisplayed.value = true;
+
+      // }
+    });
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           GestureDetector(
-            onTap: () => Get.offAll(() => MenuScreen()),
+            onTap: () => Get.to(() => MenuScreen()),
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               decoration: BoxDecoration(
@@ -200,21 +211,21 @@ class WaitingScreen extends StatelessWidget {
                 //     }
                 //   },
                 // ),
-                Divider(
-                  indent: 30,
-                  endIndent: 30,
-                  color: Colors.black.withOpacity(0.7),
-                  thickness: 1,
-                ),
+                // Divider(
+                //   indent: 30,
+                //   endIndent: 30,
+                //   color: Colors.black.withOpacity(0.7),
+                //   thickness: 1,
+                // ),
                 Text(
                   'Your Orders',
-                  style: TextConstants.subTextStyle(),
+                  style: TextConstants.mainTextStyle(),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Obx(
                       () => Column(
-                        children: OrderDataController
+                        children: WaitingScreenStateController
                             .instance.listenableOrderList
                             .asMap()
                             .entries
@@ -253,11 +264,13 @@ class WaitingScreen extends StatelessWidget {
                                       ),
                                     ),
                                     Visibility(
-                                      visible: order.status == OrderStatus.Editing,
+                                      visible:
+                                          order.status == OrderStatus.Editing,
                                       child: ActionButton(
                                         title: 'Complete Order',
                                         onPressed: () async {
-                                          await WaitingScreenStateController.instance
+                                          await WaitingScreenStateController
+                                              .instance
                                               .completeOrder(order: order);
                                         },
                                         width: 200,
