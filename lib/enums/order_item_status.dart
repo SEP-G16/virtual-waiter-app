@@ -1,5 +1,22 @@
 enum OrderItemStatus{
-  Pending, Processing, Ready, Editing, Cancelled
+  Editing, Pending, Rejected, Processing, Complete;
+
+  static OrderItemStatus fromString(String status){
+    switch(status){
+      case 'Editing':
+        return OrderItemStatus.Editing;
+      case 'Pending':
+        return OrderItemStatus.Pending;
+      case 'Rejected':
+        return OrderItemStatus.Rejected;
+      case 'Processing':
+        return OrderItemStatus.Processing;
+      case 'Complete':
+        return OrderItemStatus.Complete;
+      default:
+        return OrderItemStatus.Editing;
+    }
+  }
 }
 
 extension OrderItemStatusExtension on OrderItemStatus{
@@ -11,12 +28,12 @@ extension OrderItemStatusExtension on OrderItemStatus{
         return 'Pending';
       case OrderItemStatus.Processing:
         return 'Processing';
-      case OrderItemStatus.Ready:
-        return 'Ready';
+      case OrderItemStatus.Complete:
+        return 'Complete';
       case OrderItemStatus.Editing:
         return 'Editing';
-      case OrderItemStatus.Cancelled:
-        return 'Cancelled';
+      case OrderItemStatus.Rejected:
+        return 'Rejected';
       default:
         return 'Editing';
     }
