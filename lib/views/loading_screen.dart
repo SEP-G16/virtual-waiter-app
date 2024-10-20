@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:virtual_waiter/controller/data/order_data_controller.dart';
 import 'package:virtual_waiter/controller_initializer.dart';
+import 'package:virtual_waiter/views/waiting_screen.dart';
 import 'package:virtual_waiter/views/welcome_screen.dart';
+
+import '../constants/text_constants.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});
@@ -9,7 +13,7 @@ class LoadingScreen extends StatelessWidget {
   Future<String> initControllers() async {
     try {
       if (!ControllerInitializer.initialized) {
-        ControllerInitializer.initAllControllers();
+        await ControllerInitializer.initAllControllers();
       }
       return 'Done';
     } catch (e) {
@@ -24,18 +28,19 @@ class LoadingScreen extends StatelessWidget {
         future: initControllers(),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            if(OrderDataController.previousSession)
+              {
+                return WaitingScreen(previousSession: true,);
+              }
             return WelcomeScreen();
           } else if (snapshot.hasError) {
             return Scaffold(
               body: SafeArea(
                 child: Container(
                   alignment: Alignment.center,
-                  child: const Text(
+                  child: Text(
                     'An unexpected error occurred!',
-                    style: TextStyle(
-                      fontSize: 40,
-                      color: Colors.redAccent,
-                    ),
+                    style: TextConstants.mainTextStyle(textColor: Colors.red),
                   ),
                 ),
               ),
