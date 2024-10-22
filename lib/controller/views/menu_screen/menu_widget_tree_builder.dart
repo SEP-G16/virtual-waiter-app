@@ -10,7 +10,8 @@ import 'package:virtual_waiter/model/menu_item.dart';
 import 'package:virtual_waiter/views/view_menu_item_screen.dart';
 
 class MenuWidgetTreeBuilder extends GetxController {
-  List<Widget> _widgetList = [];
+  RxList<Widget> _widgetList = <Widget>[].obs;
+
   List<Widget> get widgetList => _widgetList;
 
   final MenuDataController _menuDataController = MenuDataController.instance;
@@ -33,7 +34,8 @@ class MenuWidgetTreeBuilder extends GetxController {
   void onReady() {
     // TODO: implement onReady
     super.onReady();
-    ever(_menuDataController.menuChangedListener, (_) => _buildMenuWidgetTree());
+    debounce(
+        _menuDataController.menuChangedListener, (_) => _buildMenuWidgetTree());
   }
 
   void _buildMenuWidgetTree() {
@@ -43,62 +45,68 @@ class MenuWidgetTreeBuilder extends GetxController {
     for (var entry in menuItemMap.entries) {
       String category = entry.key;
       List<MenuItem> items = entry.value;
-      _widgetList.add(Container(
-        margin: const EdgeInsets.symmetric(
-          horizontal: 20.0,
-          vertical: 5.0,
-        ),
-        child: Row(
-          children: [
-            const Expanded(
-              child: Divider(
-                thickness: 2,
-                color: Colors.black,
-                height: 10,
+
+      bool allAreOutOfStock = menuItemMap[category]!
+          .every((menuItem) => menuItem.status == MenuItemStatus.OutOfStock);
+
+      if (!allAreOutOfStock) {
+        _widgetList.add(Container(
+          margin: const EdgeInsets.symmetric(
+            horizontal: 20.0,
+            vertical: 5.0,
+          ),
+          child: Row(
+            children: [
+              const Expanded(
+                child: Divider(
+                  thickness: 2,
+                  color: Colors.black,
+                  height: 10,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10.0,
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10.0,
+                ),
+                child: Text(
+                  category,
+                  style: TextConstants.subTextStyle(fontSize: 20),
+                ),
               ),
-              child: Text(
-                category,
-                style: TextConstants.subTextStyle(fontSize: 20),
+              const Expanded(
+                child: Divider(
+                  thickness: 2,
+                  color: Colors.black,
+                  height: 10,
+                ),
               ),
-            ),
-            const Expanded(
-              child: Divider(
-                thickness: 2,
-                color: Colors.black,
-                height: 10,
+            ],
+          ),
+        ));
+        for (MenuItem item in items) {
+          if (item.status == MenuItemStatus.InStock) {
+            _widgetList.add(
+              MenuItemTile(
+                item: item,
+                onPressed: () {
+                  if (_orderDataController.orderItemAlreadyExists(
+                      menuItemId: item.id)) {
+                    _vmisStateController.initByOrderItem(
+                        orderItem:
+                            _orderDataController.findByMenuItemId(id: item.id));
+                  } else {
+                    _vmisStateController.menuItem = item;
+                  }
+                  //setting menu item here instead of setting it in the ViewMenuItemScreen
+                  Get.to(
+                    () => ViewMenuItemScreen(
+                      menuItem: item,
+                    ),
+                  );
+                },
               ),
-            ),
-          ],
-        ),
-      ));
-      for (MenuItem item in items) {
-        if (item.status == MenuItemStatus.InStock) {
-          _widgetList.add(
-            MenuItemTile(
-              item: item,
-              onPressed: () {
-                if (_orderDataController.orderItemAlreadyExists(
-                    menuItemId: item.id)) {
-                  _vmisStateController.initByOrderItem(
-                      orderItem:
-                          _orderDataController.findByMenuItemId(id: item.id));
-                } else {
-                  _vmisStateController.menuItem = item;
-                }
-                //setting menu item here instead of setting it in the ViewMenuItemScreen
-                Get.to(
-                  () => ViewMenuItemScreen(
-                    menuItem: item,
-                  ),
-                );
-              },
-            ),
-          );
+            );
+          }
         }
       }
     }

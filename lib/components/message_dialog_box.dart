@@ -9,8 +9,9 @@ class MessageDialogBox {
   final String message;
   String? btnText;
   void Function()? onTap;
+  TextAlign? textAlign;
 
-  MessageDialogBox({required this.message, this.onTap, this.btnText}) {
+  MessageDialogBox({required this.message, this.onTap, this.btnText, this.textAlign}) {
     _showDialog();
   }
 
@@ -29,6 +30,7 @@ class MessageDialogBox {
               Text(
                 message,
                 style: TextConstants.subTextStyle(),
+                textAlign: textAlign,
               ),
               SizedBox(
                 height: 20,

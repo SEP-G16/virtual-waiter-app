@@ -69,6 +69,7 @@ class MenuItem {
       addOns: map['addOns'] != null
           ? List<AddOn>.from(map['addOns'].map((addOn) => AddOn.fromMap(addOn)))
           : [],
+      status: MenuItemStatus.fromString(map['status']),
     );
   }
 

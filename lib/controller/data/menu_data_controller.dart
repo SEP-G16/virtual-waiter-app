@@ -4,6 +4,7 @@ import 'package:virtual_waiter/controller/network/menu_data_network_controller.d
 import 'package:virtual_waiter/enums/menu_item_status.dart';
 
 import '../../model/menu_item.dart';
+import 'package:flutter/material.dart';
 
 class MenuDataController extends GetxController {
   Map<String, List<MenuItem>> _menuItemOrderedMap = {};
@@ -46,11 +47,13 @@ class MenuDataController extends GetxController {
           .add(menuItem);
     }
 
+
+
+
     _menuItemOrderedMap.forEach((category, items) {
       items.sort((a, b) => a.name.compareTo(b.name));
     });
 
-    _menuChangedListener.update((val) => val! + 1);
   }
 
   MenuItem findItemById({required int id}) {
@@ -78,9 +81,12 @@ class MenuDataController extends GetxController {
 
     if (status == MenuItemStatus.OutOfStock) {
       MessageDialogBox(
+        textAlign: TextAlign.center,
         message:
             'Oops! It looks like ${item.name} is now out of stock.\nAny pending orders with this item will be rejected.\nWe apologize for the inconvenience\nand appreciate your understanding!',
       );
     }
+
+    _menuChangedListener.update((val) => val! + 1);
   }
 }

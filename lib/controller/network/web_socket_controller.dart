@@ -67,7 +67,7 @@ class WebSocketController extends GetxController {
           }
       });
 
-      _socket.on("readMenuItemStatusUpdate", (data){
+      _socket.on("readUpdateMenuItemStatus", (data){
         Map<String, dynamic> menuItemMap = jsonDecode(data);
         int id = menuItemMap['id'];
         MenuItemStatus status = MenuItemStatus.fromString(menuItemMap['status']);

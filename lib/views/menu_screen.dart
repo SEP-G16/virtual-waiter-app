@@ -121,8 +121,11 @@ class MenuScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Obx(() {
                       bool onlyEditableOrder = OrderDataController
-                          .instance.listenableOrderList.length == 1 && OrderDataController
-                          .instance.listenableOrderList.first.status == OrderStatus.Editing;
+                                  .instance.listenableOrderList.length ==
+                              1 &&
+                          OrderDataController
+                                  .instance.listenableOrderList.first.status ==
+                              OrderStatus.Editing;
 
                       bool noItemsHaveBeenAddedYet = OrderDataController
                           .instance.listenableOrderList.isEmpty;
@@ -142,9 +145,11 @@ class MenuScreen extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 physics: ScrollPhysics(),
-                child: Column(
-                  children: MenuWidgetTreeBuilder.instance.widgetList,
-                ),
+                child: Obx(() {
+                  return Column(
+                    children: MenuWidgetTreeBuilder.instance.widgetList.toList(),
+                  );
+                }),
               ),
             ),
           ],
